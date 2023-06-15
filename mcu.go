@@ -18,8 +18,9 @@ func addMcu(P *arrPasien, paket arrPaketMcu, history *arrHistoryMcu, n_pasien, n
 	var inPasien pasien
 	var jenisMcu int = n_paket + 1
 	var isRegis string
-	var idPasien int
+	var idPasien, historyId int
 	var found bool
+	var temp arrHistoryMcu = *history
 	clearScreen()
 	for isRegis != "y" && isRegis != "n" {
 		fmt.Print("Apakah pasien sudah terdaftar? (y/n): ")
@@ -32,7 +33,7 @@ func addMcu(P *arrPasien, paket arrPaketMcu, history *arrHistoryMcu, n_pasien, n
 				idx := searchPasienId(*P, *n_pasien, idPasien)
 				if idx != -1 {
 					found = true
-					inPasien.nama = P[idx].nama
+					inPasien = P[idx]
 					fmt.Println("")
 					printSelectedPasien(*P, idx)
 					toContinue()
@@ -53,8 +54,8 @@ func addMcu(P *arrPasien, paket arrPaketMcu, history *arrHistoryMcu, n_pasien, n
 			fmt.Println("Data anda sudah tersimpan, silahkan melakukan medical checkup!")
 			fmt.Println("Klik Enter to continue...")
 			fmt.Scanln()
-			P[*n_pasien] = inPasien
-			*n_pasien++
+			insertPasien(P, n_pasien, inPasien)
+			inPasien = P[*n_pasien-1]
 		default:
 			fmt.Println("Inputan tidak valid, silahkan ulangi")
 			continue
@@ -73,14 +74,22 @@ func addMcu(P *arrPasien, paket arrPaketMcu, history *arrHistoryMcu, n_pasien, n
 	fmt.Println("")
 	fmt.Println("Medical Chekup anda telah terekam, Terima kasih!")
 	toContinue()
-	history[*n_history].nama = inPasien.nama
+	sortHistoryId(&temp, *n_history, "asc")
+	if *n_history > 0 {
+		historyId = temp[*n_history-1].id + 1
+	} else {
+		historyId = temp[*n_history].id + 1
+	}
+	history[*n_history].id = historyId
+	history[*n_history].pasien = inPasien
 	history[*n_history].paketMcu = paket[jenisMcu-1].nama
 	history[*n_history].totalHarga = paket[jenisMcu-1].harga
-	history[*n_history].paketMcu = paket[jenisMcu-1].nama
 	history[*n_history].waktu.tanggal = getDate()
 	history[*n_history].waktu.bulan = getMonth()
 	history[*n_history].waktu.tahun = getYear()
 	*n_history++
+	storeDataHistory(*history, *n_history)
+	loadDataHistory(history, n_history)
 }
 
 func addPaket(P *arrPaketMcu, n *int) {
@@ -89,14 +98,33 @@ func addPaket(P *arrPaketMcu, n *int) {
 
 	for inPaket.nama != "stop" {
 		fmt.Scanln(&inPaket.nama, &inPaket.harga)
-		sortIdPaket(&temp, *n, "asc")
-		inPaket.id = temp[*n-1].id + 1
 		if inPaket.nama != "stop" {
-			P[*n] = inPaket
-			*n++
-			storeDataPaket(*P, *n)
-			loadDataPaket(P, n)
+			if !isPaketExist(*P, *n, inPaket.harga, inPaket.nama) {
+				sortIdPaket(&temp, *n, "asc")
+				if *n > 0 {
+					inPaket.id = temp[*n-1].id + 1
+				} else {
+					inPaket.id = temp[*n].id + 1
+				}
+				P[*n] = inPaket
+				temp[*n] = inPaket
+				*n++
+				storeDataPaket(*P, *n)
+				loadDataPaket(P, n)
+			}
 		}
+	}
+}
+
+func isPaketExist(pasien arrPaketMcu, n, harga int, nama string) bool {
+	var i int
+	for i < n && (pasien[i].nama != nama || pasien[i].harga != harga) {
+		i++
+	}
+	if i != n {
+		return true
+	} else {
+		return false
 	}
 }
 

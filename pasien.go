@@ -10,19 +10,37 @@ func addPasien(P *arrPasien, n *int) {
 
 	for inPasien.nama != "stop" {
 		fmt.Scanln(&inPasien.nama, &inPasien.umur, &inPasien.alamat)
-		sortId(&temp, *n, "asc")
-		if *n > 0 {
-			inPasien.id = temp[*n-1].id + 1
-		} else {
-			inPasien.id = temp[*n].id + 1
-		}
 		if inPasien.nama != "stop" {
-			P[*n] = inPasien
-			*n++
-			storeDataPasien(*P, *n)
-			loadDataPasien(P, n)
+			if !isPasienExist(*P, *n, inPasien.umur, inPasien.nama, inPasien.alamat) {
+				sortId(&temp, *n, "asc")
+				if *n > 0 {
+					inPasien.id = temp[*n-1].id + 1
+				} else {
+					inPasien.id = temp[*n].id + 1
+				}
+				P[*n] = inPasien
+				temp[*n] = inPasien
+				*n++
+				storeDataPasien(*P, *n)
+				loadDataPasien(P, n)
+			}
 		}
 	}
+}
+
+func insertPasien(P *arrPasien, n *int, data pasien) {
+	var temp arrPasien = *P
+	sortId(&temp, *n, "asc")
+	if *n > 0 {
+		data.id = temp[*n-1].id + 1
+	} else {
+		data.id = temp[*n].id + 1
+	}
+	P[*n] = data
+	temp[*n] = data
+	*n++
+	storeDataPasien(*P, *n)
+	loadDataPasien(P, n)
 }
 
 func sortPasien(P arrPasien, n int) {
@@ -127,6 +145,18 @@ func sortNama(pasien *arrPasien, n int, sortType string) {
 			}
 		}
 		pasien[i], pasien[maxIdx] = pasien[maxIdx], pasien[i]
+	}
+}
+
+func isPasienExist(pasien arrPasien, n, umur int, nama, alamat string) bool {
+	var i int
+	for i < n && (pasien[i].nama != nama || pasien[i].umur != umur || pasien[i].alamat != alamat) {
+		i++
+	}
+	if i != n {
+		return true
+	} else {
+		return false
 	}
 }
 

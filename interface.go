@@ -11,9 +11,9 @@ func menuInterface(menu *int) {
 	fmt.Println("==============================")
 	fmt.Println("Pilihan menu yang tersedia: ")
 	fmt.Println("1. Medical Checkup")
-	fmt.Println("2. Data Paket MCU (WIP)")
+	fmt.Println("2. Data Paket MCU")
 	fmt.Println("3. Data Pasien")
-	fmt.Println("4. Rekap Hasil MCU (WIP)")
+	fmt.Println("4. Rekap Hasil MCU")
 	fmt.Println("5. Exit")
 	fmt.Println("------------------------------")
 	fmt.Print("Silahkan masukkan pilihan: ")
@@ -28,6 +28,8 @@ func subMenuInterface(menu int, subMenu *int) {
 		title = "Data Paket MCU"
 	} else if menu == 3 {
 		title = "Data Pasien"
+	} else if menu == 4 {
+		title = "Data History MCU"
 	}
 	clearScreen()
 	fmt.Println("==============================")
@@ -40,7 +42,12 @@ func subMenuInterface(menu int, subMenu *int) {
 	fmt.Println("4. Delete Data")
 	fmt.Println("5. Cari Data")
 	fmt.Println("6. Sort Data")
-	fmt.Println("7. Back")
+	if menu == 4 {
+		fmt.Println("7. Laporan Pemasukan")
+		fmt.Println("8. Back")
+	} else {
+		fmt.Println("7. Back")
+	}
 	fmt.Println(" ------------------------------")
 	fmt.Print("Silahkan masukkan pilihan: ")
 	fmt.Scanln(subMenu)
